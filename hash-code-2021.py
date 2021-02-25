@@ -51,17 +51,20 @@ def read_input(input_file):
             intersections[E] = []
         intersections[E].append(street_name)
         streets[street_name] = BEL
+        street += 1
 
     car = 0
     # map of cars -> [street names]
     while car < V:
         split = input.readline().split()
-        P = split[0]
+        P = int(split[0])
         street = 1
         streets = []
         while street < P:
             streets.append(split[street])
+            street += 1
         cars[car] = streets
+        car += 1
 
     input.close()
 
@@ -71,7 +74,7 @@ def write_solution(schedule, input_letter):
     with open('{}_soln.txt'.format(input_letter), 'w') as solution:
         num_intersections = len(schedule)
         text = "" + str(num_intersections) + "\n"
-        for intersection, streets in schedule.items:
+        for intersection, streets in schedule.items():
             text += str(intersection) + " "
             text += str(len(streets)) + "\n"
             for (street, seconds) in streets:
@@ -94,6 +97,8 @@ def get_file_and_write_output(problem):
 
     # Get the input
     D, I, S, V, F, streets, cars, intersections = read_input('inputs/{}'.format(file_name))
+
+    print("Attempting Solution for: ", file_name)
 
     #Process the input
     soln = scheduler(D, I, S, V, F, streets, cars, intersections)
