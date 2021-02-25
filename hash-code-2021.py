@@ -13,9 +13,11 @@ file_names = {'a': "a.txt",
 # F - bonus points
 # streets -map of street name -> [B, E, L]
 # cars - map of cars (number) -> [street names]
+# intersections - map of intersection numbers -> [street names]
 def read_input(input_file):
     streets = {}
     cars = {}
+    intersections = {}
     
     # opens the file
     input = open(input_file, 'r')
@@ -30,14 +32,24 @@ def read_input(input_file):
     F = int(split[4])
 
     #map of street name -> [B, E, L]
+    #map of intersection no -> [street names]
     street = 0
     while street < S:
         split = input.readline().split()
         BEL = []
-        BEL.append(int(split[0]))
-        BEL.append(int(split[1]))
-        BEL.append(int(split[3]))
+        B = int(split[0])
+        E = int(split[1])
+        L = int(split[3])
         street_name = split[2]
+        BEL.append(B)
+        BEL.append(E)
+        BEL.append(L)
+        if B not in intersections:
+            intersections[B] = []
+        intersections[B].append(street_name)
+        if E not in intersections:
+            intersections[E] = []
+        intersections[E].append(street_name)
         streets[street_name] = BEL
 
     car = 0
@@ -53,7 +65,7 @@ def read_input(input_file):
 
     input.close()
 
-    return D, I, S, V, F, streets, cars
+    return D, I, S, V, F, streets, cars, intersections
 
 def write_solution(schedule, input_letter):
     with open('{}_soln.txt'.format(input_letter), 'w') as solution:
@@ -69,7 +81,7 @@ def write_solution(schedule, input_letter):
         solution.write(text)
 
 # INPUT YOUR SOLUTION HERE
-def scheduler(D, I, S, V, F, streets, cars):
+def scheduler(D, I, S, V, F, streets, cars, intersections):
     # map of intersection no. -> [(street, seconds per cycle)]
     schedule = {}
     return schedule
@@ -81,10 +93,10 @@ def get_file_and_write_output(problem):
     print("Parsing: ", file_name)
 
     # Get the input
-    D, I, S, V, F, streets, cars = read_input('inputs/{}'.format(file_name))
+    D, I, S, V, F, streets, cars, intersections = read_input('inputs/{}'.format(file_name))
 
     #Process the input
-    soln = scheduler(D, I, S, V, F, streets, cars)
+    soln = scheduler(D, I, S, V, F, streets, cars, intersections)
 
     write_solution(soln, problem)
 
