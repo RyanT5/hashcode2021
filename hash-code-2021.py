@@ -55,6 +55,14 @@ def read_input(input_file):
             exiting_streets[E] = []
         exiting_streets[E].append(street_name)            
         
+        if B not in intersection_frequency:
+            intersection_frequency[B] = 0
+        intersection_frequency[B] += 1
+
+        if E not in intersection_frequency:
+            intersection_frequency[E] = 0
+        intersection_frequency[E] += 1
+
         if street_name not in streets:
             streets[street_name] = []
         streets[street_name].append(B)
@@ -77,7 +85,11 @@ def read_input(input_file):
 
     input.close()
 
-    return D, I, S, V, F, streets, cars, entering_streets, exiting_streets
+    #sort_by_frequency = sorted(intersection_frequency.items(),key=operator.itemgetter(1),reverse=True)
+    #sorted_intersections = collections.OrderedDict(sort_by_frequency).keys()
+    sorted_intersections = intersection_frequency
+
+    return D, I, S, V, F, streets, cars, entering_streets, exiting_streets, intersection_frequency
 
 def write_solution(schedule, input_letter):
     with open('{}_soln.txt'.format(input_letter), 'w') as solution:
@@ -92,7 +104,7 @@ def write_solution(schedule, input_letter):
         solution.write(text)
 
 # INPUT YOUR SOLUTION HERE
-def scheduler(D, I, S, V, F, streets, cars, entering_streets, exiting_streets):
+def scheduler(D, I, S, V, F, streets, cars, entering_streets, exiting_streets, intersection_frequency):
     # map of intersection no. -> [(street, seconds per cycle)]
     schedule = {}
     street_in_schedule = {}
@@ -108,25 +120,26 @@ def scheduler(D, I, S, V, F, streets, cars, entering_streets, exiting_streets):
     sorted_car_paths = collections.OrderedDict(sort_by_path_length)
 
     for car, path in sorted_car_paths.items():
+    #for _, path in cars.items():
         for street in cars[car]:
+        #for street in path:
             if street not in street_in_schedule:
                 BEL = streets[street]
-                E = BEL[1]
-                if E not in schedule:
-                    schedule[E] = []
+                intersection = BEL[1]
 
-                no_entering_streets = len(entering_streets[E])
-                no_exiting_streets = len(exiting_streets[E])
+                if intersection not in schedule:
+                    schedule[intersection] = []
+                no_entering_streets = len(entering_streets[intersection])
+                no_exiting_streets = len(exiting_streets[intersection])
                 no_streets = no_exiting_streets + no_entering_streets
+                average = int(no_streets/no_exiting_streets)
                 time = 0
-                for (_,t) in schedule[E]:
+                for (_,t) in schedule[intersection]:
                     time += t
-                if time == 0:
-                    schedule[E].append((street, no_entering_streets))
-                elif time > 0 and time < no_streets:
-                    schedule[E].append((street, no_streets-time))
+                if time > 0 and time < no_streets:
+                    schedule[intersection].append((street, no_streets-time))
                 else:
-                    schedule[E].append((street, 1))
+                    schedule[intersection].append((street, average))
                 street_in_schedule[street] = True
     return schedule
 
@@ -137,12 +150,12 @@ def get_file_and_write_output(problem):
     print("Parsing: ", file_name)
 
     # Get the input
-    D, I, S, V, F, streets, cars, entering_streets, exiting_streets = read_input('inputs/{}'.format(file_name))
+    D, I, S, V, F, streets, cars, entering_streets, exiting_streets, intersection_frequency = read_input('inputs/{}'.format(file_name))
 
     print("Attempting Solution for: ", file_name)
 
     #Process the input
-    soln = scheduler(D, I, S, V, F, streets, cars, entering_streets, exiting_streets)
+    soln = scheduler(D, I, S, V, F, streets, cars, entering_streets, exiting_streets, intersection_frequency)
 
     write_solution(soln, problem)
 
