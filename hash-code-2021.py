@@ -87,7 +87,6 @@ def write_solution(schedule, input_letter):
             for (street, seconds) in streets:
                 text += street + " " + str(seconds) + "\n"
             text.rstrip()
-            text += "\n"
         solution.write(text)
 
 # INPUT YOUR SOLUTION HERE
